@@ -413,10 +413,10 @@ While variables are named using camelCase, files should be named using a [snake 
 
 **Use an ending to indicate the content type of the file:**
 
-- `Component.tsx`
-- `useComponent.ts`
-- `Component.spec.tsx`
-- `component.service.ts`
+- `descriptive-name.view.tsx`
+- `descriptive-name.controller.ts`
+- `descriptive-name.service.ts`
+- `descriptive-name.spec.tsx`
 
 # React
 
