@@ -62,6 +62,38 @@ On occasion, we'll need to handle snake_case properties in API responses, but th
 
 In general, the goals with a variable declaration are to keep code clear, concise and easy to read. Historically, JavaScript developers sought short variable names because screens were narrow and minification was not a widespread practice. Neither of these concerns exists today and, instead, we want every developer to have as much information as possible with as little effort as required – allowing for quick onboarding, readable interfaces and efficient debugging.
 
+## Objects
+
+### Organize object keys alphabetically
+
+Object properties and export statements should be organized alphabetically to maintain consistency and improve readability.
+
+```typescript
+// don't do this
+const user = {
+  name: 'John',
+  email: 'john@example.com',
+  age: 30,
+  address: '123 Main St'
+};
+
+export { userService, authService, apiClient };
+
+// do this instead
+const user = {
+  address: '123 Main St',
+  age: 30,
+  email: 'john@example.com',
+  name: 'John'
+};
+
+export { apiClient, authService, userService };
+```
+
+**Why?**
+
+Alphabetical organization makes diffs easier to read and understand, as changes are predictable and localized. It also enables automatic formatting tools to maintain consistency across the codebase without manual intervention.
+
 ## Domain Constants
 
 The primary exception to the above camelCase rule is when defining constants for use throughout a component, page or the whole application. These should be defined in all caps with underscores used to separate words, what is known as [Screaming Snake Case](https://dev.to/fission/screaming-snake-case-43kj) or, as I call it, My Uncle On Facebook Case.
