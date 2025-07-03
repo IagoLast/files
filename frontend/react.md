@@ -1,4 +1,13 @@
-# React
+# React & Frontend Components
+
+## Component Principles
+- Single responsibility
+- Composition over inheritance  
+- Prop typing with TypeScript
+- Meaningful component names
+- Presentation components (UI only)
+- Container components (logic + data)
+- Custom hooks (reusable logic)
 
 ## Classes, components and constructor functions
 
@@ -181,4 +190,51 @@ my-component/
   my-component.view.tsx
   my-component.spec.tsx
   my-component.controller.ts
-``` 
+```
+
+## Architecture Overview
+
+### Types as Entities
+
+Using TypeScript types as entities in our architecture brings several significant advantages to our codebase. By treating types as pure data structures without behavior, we create a more functional and maintainable codebase. This approach eliminates the need to reconstruct class instances from server data, making data flow simpler and more predictable throughout the application.
+
+### Services
+
+Services are groups of pure functions where the business logic of our application is defined. Generally these functions will be part of our hooks, but sometimes there is some shared logic throughout the application that needs to be extracted into services.
+
+Services should:
+- Be collections of pure functions
+- Follow naming convention `*.service.ts`
+- Have a default export containing all functions
+- Operate on type-defined entities
+- Be easily testable and mockable
+
+Example:
+```typescript
+// password-validation.service.ts
+interface IPasswordValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+function validatePassword(password: string): IPasswordValidationResult {
+  const errors: string[] = [];
+  
+  if (!getHasLowercaseChar(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+export default {
+  validatePassword
+};
+```
+
+### Repositories
+
+Repositories are specialized services that handle data operations, typically interacting with a server through CRUD operations. They act as an abstraction layer between our application and the data source.

@@ -222,7 +222,7 @@ We can as well change the parameter order without side effects or skip some of t
 
 ## Private fields/functions
 
-JavaScript provides no native way to declare a private variable or method – though there are multiple [old school](https://www.crockford.com/javascript/private.html) and [new school](https://www.sitepoint.com/javascript-private-class-fields/) approaches to solving that problem. At APTO, we define private fields and functions as any function that will not be exported by a component or module's interface and we use the common convention of prefacing their name with an underscore.
+JavaScript provides no native way to declare a private variable or method – though there are multiple [old school](https://www.crockford.com/javascript/private.html) and [new school](https://www.sitepoint.com/javascript-private-class-fields/) approaches to solving that problem. We define private fields and functions as any function that will not be exported by a component or module's interface and we use the common convention of prefacing their name with an underscore.
 
 ```typescript
 // do this
@@ -281,4 +281,32 @@ Also, services should have a default export containing every exported function.
 
 **Why?**
 
-Separating out service logic from components server the dual purpose of extracting logical, stateless concerns from the UI and possible side effects, while also making it easy to set up a [test double](https://martinfowler.com/bliki/TestDouble.html) on a default export. 
+Separating out service logic from components server the dual purpose of extracting logical, stateless concerns from the UI and possible side effects, while also making it easy to set up a [test double](https://martinfowler.com/bliki/TestDouble.html) on a default export.
+
+## Types & Interfaces
+
+### Use self-descriptive names prefaced by "I..."
+
+```ts
+// don't do this
+interface Money {
+  currency: Currency;
+  amount: number;
+};
+
+// do this
+interface IMoney {
+  currency: ICurrency;
+  amount: number;
+};
+```
+
+### Why?
+
+Being descriptive when writing a type alias allows us to understand how that type is meant to be used.
+
+On the other hand, prefacing it with I... allows us to identify quickly the variable as a type alias and prevents conflicts with class names or global variables.
+
+- Use nouns
+- Function arguments should be named `I<function-name>Args`
+- Function return values should be named `I<functionName>ReturnValue` 

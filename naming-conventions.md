@@ -1,4 +1,4 @@
-The intention of this document is to standardise JavaScript and CSS naming conventions and syntaxes across frontend repositories. Don’t shoot the messenger.  Many subheadings also includes a “Why?” section to explain our rationale.
+The intention of this document is to standardise JavaScript and CSS naming conventions and syntaxes across frontend repositories. Don't shoot the messenger.  Many subheadings also includes a "Why?" section to explain our rationale.
 
 # JavaScript
 
@@ -19,11 +19,11 @@ const currentYear = 2020;
 
 ```
 
-If a variable’s value will not change, define it with `const` to make it immutable. Otherwise, unless necessary, use `let` in order to declare variables in the smallest scope possible. There are [very few cases](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#Redeclarations) where you will need to use `var`.
+If a variable's value will not change, define it with `const` to make it immutable. Otherwise, unless necessary, use `let` in order to declare variables in the smallest scope possible. There are [very few cases](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#Redeclarations) where you will need to use `var`.
 
 ### Avoid abbreviations
 
-Try to keep variable names short, but don’t sacrifice descriptiveness in fear of verbosity. With this in mind, avoid abbreviating variable names.
+Try to keep variable names short, but don't sacrifice descriptiveness in fear of verbosity. With this in mind, avoid abbreviating variable names.
 
 ```typescript
 // don't do this
@@ -58,7 +58,7 @@ const newUser = {
 
 ```
 
-On occasion, we’ll need to handle snake_case properties in API responses, but they should be converted to camelCase before leaving their associated `service`.
+On occasion, we'll need to handle snake_case properties in API responses, but they should be converted to camelCase before leaving their associated `service`.
 
 **Why?**
 
@@ -204,14 +204,14 @@ We encourage you to name the object args for clarity and destructure it on a sin
 
 **Why?**
 
-When calling a function with multiple parameters, it’s helpful to know what the parameters are about…
+When calling a function with multiple parameters, it's helpful to know what the parameters are about...
 
 ```typescript
 greet('Lisa', 'Simpson', 12, 'Springfield')
 
 ```
 
-For instance, in this case, is not obvious what 12 refers to. It’s a number but it refers to an age, a day of the month, an amount? Using an object, we emulate named parameters, hence every option the function operates upon on gets "labelled":
+For instance, in this case, is not obvious what 12 refers to. It's a number but it refers to an age, a day of the month, an amount? Using an object, we emulate named parameters, hence every option the function operates upon on gets "labelled":
 
 ```typescript
 greet({ name: 'Lisa', surname: 'Simpson', age: 12 })
@@ -287,9 +287,9 @@ Separating out service logic from components server the dual purpose of extracti
 
 # Typescript
 
-## Types &amp; Interfaces
+## Types & Interfaces
 
-### Use self-descriptive names prefaced by "I…"
+### Use self-descriptive names prefaced by "I..."
 
 ```typescript
 // don't do this
@@ -318,6 +318,34 @@ In another hand, prefacing it with I... allow us to identify quickly the variabl
 - Function arguments should be named `I<function-name>Args`
 - Function return values should be named `I<functionName>ReturnValue`
 
+## Custom properties
+
+Commonly known as "CSS variables".
+
+### Defining a custom property
+
+Custom properties _must_ be within a selector and start with two dashes:
+
+```css
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --spacing-small: 8px;
+  --spacing-medium: 16px;
+}
+```
+
+### Using a custom property
+
+Use custom properties with the `var()` function:
+
+```css
+.button {
+  background-color: var(--primary-color);
+  padding: var(--spacing-small) var(--spacing-medium);
+}
+```
+
 # CSS
 
 In general, we follow the [Block Element Modifier (BEM)](http://getbem.com/) methodology when defining CSS or SASS styles.
@@ -330,12 +358,11 @@ Names should be self-descriptive and consist of letters, digits and dashes.
 
 Avoid tag names or ids and, instead, use class name selectors. Blocks should not depend on other blocks or elements on a page.
 
-```
+```css
 // do this
 .block {
-  color: (--white);
+  color: var(--white);
 }
-
 ```
 
 ## Element
@@ -344,24 +371,22 @@ Elements are semantically tied to the parent blocks. They have no standalone mea
 
 Element names should extend the block naming conventions. Their name should include the block name, followed by two underscores and then the element name.
 
-```
+```css
 // do this
 .block__elem {
   color: var(--white);
 }
-
 ```
 
 ## Modifier
 
 Modifiers are flags on blocks or elements. They represent changes in behavior and appearance. Their name should match that of the block or element they modify followed by two dashes and then a description of the intended modification.
 
-```
+```css
 // do this
 .block__elem--small {
   padding: var(--spacing--s);
 }
-
 ```
 
 ## Selectors
@@ -370,10 +395,13 @@ Unless necessary, avoid targeting elements by their selector directly in your CS
 
 For example, given the component:
 
-```
+```html
 <nav class="NavBar">
-  <a class="NavBar__link" href=#">Link</a>
+  <a class="NavBar__link" href="#">Link</a>
 </nav>
+```
+
+```css
 // don't do this
 .NavBar {
   a {
@@ -387,14 +415,13 @@ For example, given the component:
     text-decoration: none;
   }
 }
-
 ```
 
 ## State
 
 Changes in element state should be represented by a state class in the format .{verb}-{state}, following the structure defined by [the SMACCS architecture](http://smacss.com/).
 
-```
+```css
 // do this
 .BulletPoint {
   color: black;
@@ -402,91 +429,15 @@ Changes in element state should be represented by a state class in the format .{
     color: red;
   }
 }
-
-```
-
-## Custom properties
-
-Commonly known as "CSS variables".
-
-### Defining a custom property
-
-Custom properties _must_ be within a selector and start with two dashes
-
-### Using a custom property
-
-# Filenames
-
-While variables are named using camelCase, files should be named using a [snake case](https://en.wikipedia.org/wiki/Snake_case) convention. This is because sometimes git can play some tricks on you on case-insensitive filesystems. snake_case totally avoids this problem:
-
-- [https://stackoverflow.com/questions/6899582/i-change-the-capitalization-of-a-directory-and-git-doesnt-seem-to-pick-up-on-it/6899682](https://stackoverflow.com/questions/6899582/i-change-the-capitalization-of-a-directory-and-git-doesnt-seem-to-pick-up-on-it/6899682)
-
-[https://stackoverflow.com/questions/10523849/changing-capitalization-of-filenames-in-git](https://stackoverflow.com/questions/10523849/changing-capitalization-of-filenames-in-git)
-
-[https://www.reddit.com/r/git/comments/dj5b8n/lpt_check_your_uppercaselowercase_file_names/](https://www.reddit.com/r/git/comments/dj5b8n/lpt_check_your_uppercaselowercase_file_names/)
-
-**Use an ending to indicate the content type of the file:**
-
-- `Component.tsx`
-- `useComponent.ts`
-- `Component.spec.tsx`
-- `component.service.ts`
-
-# React
-
-## Classes, components and constructor functions
-
-Any function that will be utilized as a prototype/template to generate objects should be defined with the first letter of the name capitalized. In practice, for us this generally means React components, however, it could also mean JavaScript classes and, in case you are reading this in 2008, constructor functions.
-
-```typescript
-import React from 'react';
-
-// don't do this
-export default function homePage() {
-  return (<div />);
-}
-
-// do this instead
-export default function HomePage() {
-  return (<div />);
-}
-// do this
-class Rectangle {
-  constructor(height, width) {
-    this.height = height;
-    this.width = width;
-  }
-}
-
-```
-
-## Always declare components as functions
-
-In React, we can declare components either through an ES6 `class` or as functions. With the introduction of hooks, most use cases for class components fell short, and even React recommends [moving away from them](https://reactjs.org/docs/hooks-intro.html#classes-confuse-both-people-and-machines) whenever possible.
-
-```xml
-// don't do this
-class Button extends React.PureComponet {
-  render() {
-    return <button>Click!</button>
-  }
-}
-
-// do this
-function Button() {
-  return <button>Click!</button>
-}
-
 ```
 
 ## Queries and mutations
 
 We will always name the variable ending in query or mutation as appropriate:
 
-```
+```typescript
 const usersQuery;
 const createUserMutation;
-
 ```
 
 When naming functions, we will follow the following structure: use | action | resource | type:
@@ -499,9 +450,8 @@ When naming functions, we will follow the following structure: use | action | re
 For more information on how it works and the advantages of using this library, see [React Query](https://react-query.tanstack.com/).
 
 ```typescript
- useListUsersQuery();  
- CreateUserMutation(); 
-
+useListUsersQuery();  
+useCreateUserMutation(); 
 ```
 
 **Why?**
@@ -515,25 +465,25 @@ This section is unfinished
 **React applications** are generally structured as follows:
 
 - `src/`
-    - `api-client/`
-        - `apiclient.service.ts`
-    - `components/`
-        - `Notifications/`
-            - `Notifications.tsx`
-            - `Notifications.spec.tsx`
-            - `useNotifications.hook.ts`
-            - `Notifications.module.scss`
-    - `hooks/`
-    - `pages`/
-        - `home`
-            - `components/`
-                - …
-            - `Home.page.tsx`
-            - `Home.spec.tsx`
-            - `Home.module.scss`
-    - `services/`
-    - `types/`
-    - `utils/`
+  - `api-client/`
+    - `apiclient.service.ts`
+  - `components/`
+    - `Notifications/`
+      - `Notifications.tsx`
+      - `Notifications.spec.tsx`
+      - `useNotifications.hook.ts`
+      - `Notifications.module.scss`
+  - `hooks/`
+  - `pages/`
+    - `home/`
+      - `components/`
+        - …
+      - `Home.page.tsx`
+      - `Home.spec.tsx`
+      - `Home.module.scss`
+  - `services/`
+  - `types/`
+  - `utils/`
 
 ## Component structure
 
@@ -545,7 +495,6 @@ MyComponent/
   MyComponent.spec.tsx
   MyComponent.stories.tsx
   useMyComponent.ts
-
 ```
 
 Each of the files should be named with the component name so that when searching them is easy to identify to which component they relate. Here are the naming conventions for each of the files:
@@ -570,7 +519,8 @@ export default function UserPage() {
   // ... 
   return (
     <View>
-     <Button onClick={() => navigate(TRANSACTIONS_ROUTE)}>View transactions</View>
+     <Button onClick={() => navigate(TRANSACTIONS_ROUTE)}>View transactions</Button>
+    </View>
   // ...
 }
 
@@ -581,9 +531,11 @@ export default function UserPage() {
   // ... 
   return (
     <View>
-     <Button onClick={onViewTransactions}>View transactions</View>
+     <Button onClick={onViewTransactions}>View transactions</Button>
+    </View>
   // ...
 }
+
 // useUserPage.ts
 export default function useUserPage() {
   const session = useSession();
@@ -595,8 +547,8 @@ export default function useUserPage() {
     onViewTransactions: () => navigate(TRANSACTIONS_ROUTE),
     userDetails: userQuery.data?.details
   // ...
+  }
 }
-
 ```
 
 This allows us to refactor and share code across the project easier. It also sticks to the convention that component file is only in charge to render the view with the parameters injected by a hook which acts as a "controller".
@@ -616,9 +568,17 @@ MyComponent/
   MyComponent.tsx
   MyComponent.spec.tsx
   useMyComponent.ts
-
 ```
 
-
-
 # Vue
+
+This section is currently under development. Vue-specific naming conventions and guidelines will be added here in the future.
+
+For now, many of the JavaScript and TypeScript conventions above also apply to Vue projects, with some Vue-specific adaptations needed for:
+
+- Component naming (PascalCase)
+- Props and events naming
+- Composables naming (similar to React hooks)
+- Template syntax conventions
+
+More detailed Vue guidelines will be added as the project requirements develop.
