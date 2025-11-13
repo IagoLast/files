@@ -61,6 +61,31 @@ export default { checkPasswordLength };
 - Easy to test and mock.
 - Enforces namespace clarity in imports (passwordService.checkLength() vs ambiguous checkLength()).
 
+**Note:** Some services may need to interact with browser APIs (like `localStorage` for authentication). These should still be organized as services, but may have side effects. Example:
+
+```typescript
+// auth.service.ts
+const TOKEN_STORAGE_KEY = 'auth_token';
+
+function getToken(): string | null {
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+}
+
+function setToken(token: string): void {
+  localStorage.setItem(TOKEN_STORAGE_KEY, token);
+}
+
+function clearToken(): void {
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
+}
+
+function isAuthenticated(): boolean {
+  return getToken() !== null;
+}
+
+export default { getToken, setToken, clearToken, isAuthenticated };
+```
+
 ---
 
 ### 2. **Application Layer**
@@ -70,13 +95,37 @@ Implementation details such as networking, data access, and UI logic.
 #### Client
 
 - Singleton object for interacting with the backend.
-- Handles headers, auth tokens, interceptors.
+- Handles HTTP configuration, headers, and interceptors.
+- **Authentication logic should be in `auth.service.ts`, not in the client.**
 
 ```typescript
+// client/index.ts
+import axios from 'axios';
+import authService from '../services/auth.service';
+
 export const client = axios.create({ baseURL: BASE_URL });
 
-export function login(token: string) {
+function setAuthHeader(token: string): void {
   client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
+function initializeAuth(): void {
+  const token = authService.getToken();
+  if (token) {
+    setAuthHeader(token);
+  }
+}
+
+initializeAuth();
+
+export function setAuthToken(token: string): void {
+  authService.setToken(token);
+  setAuthHeader(token);
+}
+
+export function clearAuthToken(): void {
+  authService.clearToken();
+  delete client.defaults.headers.common["Authorization"];
 }
 ```
 

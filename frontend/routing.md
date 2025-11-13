@@ -21,20 +21,35 @@ src/
 │   └── namespaces.ts            # Translation namespace constants
 └── pages/
     ├── page-name/
-    │   ├── page-name.route.tsx  # Route definition
-    │   └── page-name.view.tsx   # Page component
+    │   ├── page-name.route.tsx  # Route definition (exports RouteObject)
+    │   ├── page-name.view.tsx   # Page component
+    │   └── page-name.spec.tsx   # Page tests
     └── example-page/
-        ├── example.route.tsx   # Main example route
+        ├── example.route.tsx    # Main example route
+        ├── example.view.tsx     # Example component
+        ├── example.spec.tsx     # Example tests
         └── sub-page/
-            └── sub-page.route.tsx # Nested route
+            ├── sub-page.route.tsx # Nested route
+            ├── sub-page.view.tsx  # Sub-page component
+            └── sub-page.spec.tsx  # Sub-page tests
 ```
 
 ### Key Files
 
-- **`src/router.tsx`**: Main router configuration with root route and children
+- **`src/router.tsx`**: Main router configuration that imports and uses route objects from pages
 - **`src/constants/routes.ts`**: All route path constants defined here
 - **`src/constants/namespaces.ts`**: Translation namespace constants
-- **`*.route.tsx`**: Individual route definitions with loaders and elements
+- **`*.route.tsx`**: Individual route definitions that export a `RouteObject` - these live alongside their page components
+
+### Page Structure Convention
+
+Each page folder should contain three files:
+
+1. **`[page-name].route.tsx`**: Exports the route configuration object (`RouteObject`)
+2. **`[page-name].view.tsx`**: The page component/view
+3. **`[page-name].spec.tsx`**: Tests for the page
+
+The route file exports everything needed for the router, making it easy to import and use in the main router configuration.
 
 ## Route Constants Architecture
 
@@ -68,31 +83,41 @@ Routes follow a consistent naming pattern:
 
 ### Main Router Setup (`src/router.tsx`)
 
+The main router file imports route objects from their respective page folders and assembles them:
+
 ```typescript
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
+import { ROUTE_ROOT, ROUTE_DASHBOARD } from "@/constants/routes";
+import { homePageRoute } from "@/pages/home-page/home-page.route";
+import { loginRoute } from "@/pages/login-page/login-page.route";
+import { dashboardRoute } from "@/pages/dashboard-page/dashboard.route";
+import { registerRoute } from "@/pages/register-page/register-page.route";
+// ... other route imports
+
 export const routes: RouteObject[] = [
   {
-    path: "/",
+    path: ROUTE_ROOT,
     element: <Outlet />,
     children: [
-      advancedLoginRoute,
+      homePageRoute,
       loginRoute,
       dashboardRoute,
       registerRoute,
-      forgotPasswordRoute,
-      resetPasswordRoute,
-      legacyResetPasswordRoute,
-      routePlayground,
+      // ... other routes
     ],
     loader(args) {
       // Root loader with default redirect
       const url = new URL(args.request.url);
-      if (url.pathname === "/") {
+      if (url.pathname === ROUTE_ROOT) {
         return redirect(ROUTE_DASHBOARD);
       }
       return null;
     },
   },
 ];
+
+export const router = createBrowserRouter(routes);
 ```
 
 ### Route Configuration in App Component
@@ -103,9 +128,7 @@ export function App() {
   return (
     <Provider>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider
-          router={createBrowserRouter(routes)}
-        />
+        <RouterProvider router={createBrowserRouter(routes)} />
       </QueryClientProvider>
     </Provider>
   );
@@ -116,15 +139,16 @@ export function App() {
 
 ### Basic Route Pattern
 
-Each route is defined in its own `*.route.tsx` file:
+Each route is defined in its own `*.route.tsx` file **located alongside the page component**. The route file exports a `RouteObject` that contains all the route configuration:
 
 ```typescript
 // src/pages/login-page/login-page.route.tsx
-import { RouteObject } from "react-router";
-import { LoginPage } from "./login-page.view";
+import type { RouteObject } from "react-router-dom";
+import { ROUTE_LOGIN } from "@/constants/routes";
+import LoginPage from "./login-page.view";
 
 export const loginRoute: RouteObject = {
-  path: "/login",
+  path: ROUTE_LOGIN,
   element: <LoginPage />,
   loader() {
     return i18next.loadNamespaces([NS_LOGIN]).then(() => null);
@@ -132,12 +156,60 @@ export const loginRoute: RouteObject = {
 };
 ```
 
+Then in the main router, simply import and use the route object:
+
+```typescript
+// src/router.tsx
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
+import { ROUTE_ROOT } from "@/constants/routes";
+import { loginRoute } from "@/pages/login-page/login-page.route";
+import { homePageRoute } from "@/pages/home-page/home-page.route";
+
+export const routes: RouteObject[] = [
+  {
+    path: ROUTE_ROOT,
+    element: <Outlet />,
+    children: [
+      homePageRoute,
+      loginRoute,
+      // ... other routes
+    ],
+  },
+];
+```
+
+### Complete Page Structure Example
+
+A complete page folder structure looks like this:
+
+```
+pages/
+└── home-page/
+    ├── home-page.route.tsx    # Exports homePageRoute: RouteObject
+    ├── home-page.view.tsx     # HomePage component
+    └── home-page.spec.tsx     # Tests for HomePage
+```
+
+**Benefits of this approach:**
+
+- Routes live next to their components, keeping related code together
+- Easy to find and maintain route definitions
+- Clean router file that just imports and assembles routes
+- Each page is self-contained with its route, view, and tests
+
 ### Protected Route Pattern
 
-Routes requiring authentication use loaders for protection:
+Routes requiring authentication use loaders for protection. The route file exports the complete route configuration:
 
 ```typescript
 // src/pages/dashboard-page/dashboard.route.tsx
+import type { RouteObject } from "react-router-dom";
+import { ROUTE_DASHBOARD, ROUTE_LOGIN } from "@/constants/routes";
+import DashboardPage from "./dashboard-page.view";
+import { customerListRoute } from "../customer-list/customer-list.route";
+import { customerDetailsRoute } from "../customer-details/customer-details.route";
+
 export const dashboardRoute: RouteObject = {
   path: ROUTE_DASHBOARD,
   element: <DashboardPage />,
@@ -148,9 +220,7 @@ export const dashboardRoute: RouteObject = {
   ],
   async loader() {
     // Load required namespaces
-    await Promise.all([
-      i18next.loadNamespaces([NS_DASHBOARD_INDEX, NS_PROFILE])
-    ]);
+    await Promise.all([i18next.loadNamespaces([NS_DASHBOARD_INDEX, NS_PROFILE])]);
 
     // Authentication check
     if (!authService.isAuthenticated()) {
@@ -299,9 +369,10 @@ const legacyResetPasswordRoute: RouteObject = {
 
 ### 1. Route Organization
 
-- **One route per file**: Each route is defined in its own `*.route.tsx` file
+- **Routes live with pages**: Each route is defined in a `*.route.tsx` file **alongside** the page component (`*.view.tsx`) and tests (`*.spec.tsx`)
 - **Consistent naming**: Follow the `[page-name].route.tsx` naming convention
-- **Logical grouping**: Group related routes in the same directory
+- **Export route objects**: Each `*.route.tsx` file exports a `RouteObject` that can be imported in the main router
+- **Self-contained pages**: Each page folder contains route, view, and test files together
 
 ### 2. Route Constants
 
@@ -324,17 +395,41 @@ const legacyResetPasswordRoute: RouteObject = {
 ### 5. Route Structure
 
 ```typescript
-// Recommended route structure
+// Recommended route structure in [page-name].route.tsx
+import type { RouteObject } from "react-router-dom";
+import { ROUTE_PAGE_NAME } from "@/constants/routes";
+import PageNameComponent from "./page-name.view";
+
 export const pageNameRoute: RouteObject = {
-  path: ROUTE_PAGE_NAME,           // Use constant
-  element: <PageNameComponent />,   // Import component
-  children: [],                     // Child routes if needed
-  loader() {                        // Authentication & data loading
+  path: ROUTE_PAGE_NAME, // Use constant from routes.ts
+  element: <PageNameComponent />, // Import component from same folder
+  children: [], // Child routes if needed
+  loader() {
+    // Authentication & data loading
     // 1. Load namespaces
     // 2. Check authentication
     // 3. Return data or redirect
   },
 };
+```
+
+Then in `router.tsx`:
+
+```typescript
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
+import { pageNameRoute } from "@/pages/page-name/page-name.route";
+
+export const routes: RouteObject[] = [
+  {
+    path: ROUTE_ROOT,
+    element: <Outlet />,
+    children: [
+      pageNameRoute, // Simply import and use
+      // ... other routes
+    ],
+  },
+];
 ```
 
 ## Common Patterns Summary

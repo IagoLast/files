@@ -1,6 +1,7 @@
 # Agent Workflow Guidelines
 
 ## Core Principles
+
 - **KISS**: Keep it simple
 - **YAGNI**: You aren't gonna need it - only implement what's explicitly required
 - **TDD**: Tests are formal task definitions
