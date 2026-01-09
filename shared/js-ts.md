@@ -243,6 +243,50 @@ It allows us to understand better the function without having to look at its imp
 
 We can as well change the parameter order without side effects or skip some of them without the function invocation looking weird.
 
+### Prefer early returns and guard clauses over else
+
+In general, avoid using `else` statements. Instead, use early returns and guard clauses to reduce cyclomatic complexity and make code easier to understand.
+
+```typescript
+// don't do this
+function processUser(user: IUser | null) {
+  if (user) {
+    if (user.isActive) {
+      if (user.hasPermission) {
+        return performAction(user);
+      } else {
+        return { error: "No permission" };
+      }
+    } else {
+      return { error: "User inactive" };
+    }
+  } else {
+    return { error: "User not found" };
+  }
+}
+
+// do this instead
+function processUser(user: IUser | null) {
+  if (!user) {
+    return { error: "User not found" };
+  }
+
+  if (!user.isActive) {
+    return { error: "User inactive" };
+  }
+
+  if (!user.hasPermission) {
+    return { error: "No permission" };
+  }
+
+  return performAction(user);
+}
+```
+
+**Why?**
+
+Early returns and guard clauses reduce nesting levels, making code more linear and easier to read. They also reduce cyclomatic complexity by eliminating unnecessary branching, which makes the code easier to test and maintain. Each condition is checked independently, and the happy path remains at the bottom of the function, making the main logic flow more obvious.
+
 ## Private fields/functions
 
 JavaScript provides no native way to declare a private variable or method – though there are multiple [old school](https://www.crockford.com/javascript/private.html) and [new school](https://www.sitepoint.com/javascript-private-class-fields/) approaches to solving that problem. We define private fields and functions as any function that will not be exported by a component or module's interface and we use the common convention of prefacing their name with an underscore.
