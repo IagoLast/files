@@ -56,11 +56,15 @@ This guarantees predictable impact scope for any change.
 
 ## Quick Reference
 
-| Import Type           | Allowed |
-| --------------------- | ------- |
-| Own controller        | Yes     |
-| Child components      | Yes     |
-| Global `@/components` | Yes     |
-| Parent component      | No      |
-| Sibling component     | No      |
-| Cousin component      | No      |
+| Import Type | Allowed |
+| --------------------- | ------- | .
+| Own controller | Yes |
+| Child components | Yes |
+| Global `@/components` | Yes |
+| Parent component | No |
+| Sibling component | No |
+| Cousin component | No |
+
+## Notes
+
+DO NOT USE BARREL EXPORTS FILES `index.ts`
