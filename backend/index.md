@@ -4,6 +4,7 @@
 
 ## Files
 
+- [File Organization](./file-organization.md) - Co-locate files by feature, not by kind
 - [API Responses](./api-responses.md) - Response format conventions
 - [Authorization](./authorization.md) - Layered authorization (controllers + services)
 - [Services](./services.md) - Atomic services pattern
