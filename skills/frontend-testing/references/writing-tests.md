@@ -33,7 +33,7 @@ import { describe, expect, test } from "vitest";
 import App from "@/App";
 
 describe("Bookings page", () => {
-  test("shows the new booking after the user creates it", async () => {
+  test("should show the confirmation dialog when the booking is created successfully", async () => {
     stubJsonResponse({
       path: "*/api/bookings",
       response: { data: [] },
@@ -190,7 +190,10 @@ Avoid querying CSS classes or inspecting React state. A failing accessible query
 
 ## Test design
 
-- Name the behavior, initial condition, and expected result.
+- Name every test `should <expected behavior> when <known context>`.
+- Put the observable result after `should` and the relevant initial condition or event after `when`.
+- Keep the full formula in the test description even when `describe` blocks provide context.
+- Avoid implementation terms such as function calls, hook names, internal state, or method parameters.
 - Keep Arrange, Act, and Assert visually clear.
 - Make one scenario fail for one behavioral reason.
 - Use concrete values and explicit expected results.
@@ -199,6 +202,7 @@ Avoid querying CSS classes or inspecting React state. A failing accessible query
 
 ## Review checklist
 
+- Does the test name follow `should <expected behavior> when <known context>`?
 - Does the test run in a real browser?
 - Does it render the widest practical boundary for the use case?
 - If it renders a fragment, does that fragment retain the real collaborators relevant to the behavior?
