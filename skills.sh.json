@@ -1,0 +1,14 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Frontend",
+      "description": "Skills for frontend architecture and browser testing.",
+      "skills": [
+        "frontend-architecture",
+        "frontend-testing"
+      ]
+    }
+  ]
+}

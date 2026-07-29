@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Architecture"
+  short_description: "Arquitectura frontend predecible y escalable"
+  default_prompt: "Use $frontend-architecture to design or review this frontend feature."

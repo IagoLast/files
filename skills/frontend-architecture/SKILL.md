@@ -1,0 +1,57 @@
+---
+name: frontend-architecture
+description: Design, implement, refactor, or review React frontend architecture using route-aligned pages, recursive components, controllers, TanStack Query hooks, mutations, repositories, services, and a singleton API client. Use when adding a frontend feature, deciding file or state placement, wiring router-to-API data flow, splitting components, measuring change impact, or checking dependency boundaries and naming.
+---
+
+# Frontend Architecture
+
+Build the smallest feature that preserves the dependency direction and the repository's existing conventions.
+
+## Workflow
+
+1. Inspect the existing router, aliases, query library, HTTP client, and nearby feature before creating files.
+2. Define the user-visible behavior with a colocated test.
+3. Identify the relevant state variables and the concrete change the design must absorb.
+4. Trace the feature through `router → page → controller → query or mutation → repository → API client`.
+5. Add only the layers the behavior needs. Do not create empty controllers, services, or folders.
+6. Keep views presentational and move orchestration, navigation, state, and async coordination into controllers.
+7. Run the relevant test, typecheck, lint, and build after each code change.
+8. Review imports and delete accidental abstractions or cross-feature coupling.
+
+## Non-negotiable rules
+
+- Use one file per component: every `*.view.tsx` exports exactly one React component.
+- Give every page or component a homonymous dash-case folder.
+- Put every child component or subpage in the owner's `components/` folder. Give that child its own homonymous folder and repeat the same structure recursively at every depth.
+- Allow a component to import only its own controller, its descendants, and global shared components.
+- Do not import a parent, sibling, or cousin component. Do not use barrel `index.ts` files.
+- Keep one concern per file and use descriptive suffixes: `.view.tsx`, `.controller.ts`, `.route.tsx`, `.query.ts`, `.mutation.ts`, `.repository.ts`, `.service.ts`, and `.spec.tsx`.
+- Use route constants. Keep each route object beside its page and let the root router assemble route objects.
+- Keep the API client a singleton concerned only with transport, configuration, and interceptors.
+- Put endpoint calls and server-to-domain mapping in repositories; never call the API client from a view.
+- Put server reads in query hooks and writes in mutation hooks. Mutation success must update or invalidate the affected cache deliberately.
+- Group query and mutation hooks by resource under `src/queries/<resource>/`.
+- Name hooks `use<Action><Resource>Query` or `use<Action><Resource>Mutation`.
+- Keep domain services pure unless their explicit responsibility is a browser boundary such as token storage.
+- Keep state at the lowest common owner that needs to read or change it. Derive values instead of storing redundant state.
+- Prefer `@/` aliases for cross-root imports and local `./` imports within a feature. Never climb the component tree with `../`.
+
+## Choose file placement
+
+- Route entry point or layout: `src/pages/<page>/`
+- Page-owned component or nested subpage: `src/pages/<page>/components/<child>/`
+- Reused, domain-neutral UI: `src/components/<component>/`
+- HTTP transport: `src/client/api-client.ts`
+- Resource data access and mapping: `src/repositories/<resource>.repository.ts`
+- Cached read: `src/queries/<resource>/<action>-<resource>.query.ts`
+- Server write: `src/queries/<resource>/<action>-<resource>.mutation.ts`
+- Pure business rule: `src/services/<concept>.service.ts`
+- Shared domain shape: `src/types/`
+
+Promote code to a shared location only after two real consumers need it.
+
+## Load detailed guidance
+
+Read [references/architecture.md](references/architecture.md) before designing a new feature or reviewing a structural change. Use its dependency map, canonical tree, responsibilities, and review checklist.
+
+Read [references/decision-method.md](references/decision-method.md) when choosing between designs, placing state, or reviewing/refactoring existing code. Use its change-impact method instead of arguing from patterns or folder aesthetics alone.

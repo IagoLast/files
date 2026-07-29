@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Testing"
+  short_description: "Tests reales de frontend en Vitest Browser"
+  default_prompt: "Use $frontend-testing to add a browser test for this complete user flow."
